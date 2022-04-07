@@ -1,23 +1,30 @@
 import logo from './logo.svg';
 import './App.css';
 
+function BlueDiv(){
+  return <div className = "blue">I am a blue div</div> 
+}
+
+
+function AnimalForm(){
+
+  return <></>
+}
+
+function ListMe(items){
+  const list = items.map(item => <li key={item}>{item}</li>)
+  return <ul> {list} </ul> 
+}
+
+const items= ["red","green","blue"]
+
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className='container'>
+        <BlueDiv></BlueDiv>
+        <ListMe></ListMe>
+      </div> 
     </div>
   );
 }
