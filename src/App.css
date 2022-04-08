@@ -34,7 +34,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /* font-size: calc(10px + 2vmin); */
   color: white;
   margin:0px,200px,0px,200px;
   padding:50px;
