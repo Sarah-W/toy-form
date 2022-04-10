@@ -1,4 +1,4 @@
-import './App.css';
+import './App.scss';
 import { useState } from "react";
 
 function Select({labelid,labeltext,items,state}){
@@ -6,18 +6,19 @@ function Select({labelid,labeltext,items,state}){
   function changeHandler(e){
     setSelected(e.target.value)
   }
-  const label = <label for={labelid}>{labeltext}</label>
+  const label = <label htmlFor={labelid}>{labeltext}</label>
   const options = items.map(item =>{ 
     return <option key={item} value={item}>
       {item} 
     </option>} 
   )
-  return <>
+  return <div className='textinput'>
     {label}
-    <select id={labelid} onChange={changeHandler}>
+    <select id={labelid} defaultValue='' onChange={changeHandler}>
+      <option disabled value=''>Choose Colour</option>
       {options}
     </select>
-  </>
+  </div>
 }
 
 function ValidEmail({state}){
@@ -36,8 +37,13 @@ function ValidEmail({state}){
     }
   }
   return<>
-    <label for="email">Email:</label>
-    <input type="email" id="email" onChange={changeHandler} placeholder='foo@bar.com'></input>
+  <div className='textinput'>
+      <label htmlFor="email">Email:</label>
+      <input type="email" id="email" onChange={changeHandler} placeholder='foo@bar.com'></input>
+  </div>
+  <div className='error'>
+    {email.valid? ' ':'*Email is not valid'}
+  </div>
   </>
 }
 
@@ -51,8 +57,13 @@ function ValidPassword({state}){
     }
   }
   return<>
-    <label for="pass">Password:</label>
+  <div className='textinput'>
+    <label htmlFor="pass">Password:</label>
     <input type="password"  id="pass" onChange={changeHandler}></input>
+  </div>
+    <div className='error'>
+    {(pwd.valid || pwd.value.length == 0 ) ? ' ':`*${pwd.message}`}
+  </div>
   </>
 }
 
@@ -70,7 +81,7 @@ function CheckBoxGroup({items,title,state}){
   const boxes = items.map(item=>{
     return <span key={item}>
       <input type="checkbox" id={item} name={item} value={item} onChange={()=>checkHandler(item)}></input>
-      <label for={item}> {item}</label>
+      <label htmlFor={item}> {item}</label>
     </span>
   })
   return <div className='checkboxlist'>
@@ -90,34 +101,56 @@ function TigerType({state}){
   }
 
   return<>
-  <p>You have a tiger, and a tiger must have a tiger type. What type is your tiger?</p>
-  <label for="tigertype">Tiger Type: </label>
-  <input type="text" id="tigertype" placeholder="e.g. Fierce " onChange={changeHandler}></input>
+    <p>You have a tiger, and a tiger must have a tiger type. What type is your tiger?</p>
+    <div className='textinput'>
+      <label htmlFor="tigertype">Tiger Type: </label>
+      <input type="text" id="tigertype" placeholder="e.g. Fierce " onChange={changeHandler}></input>
+    </div>
   </>
 }
 
 function AnimalForm(){
-  let [email,setEmail]=useState({value:'',valid:true})
+  let [email,setEmail]=useState({value:'',valid:true,message:""})
   let [pwd,setPwd]=useState({value:'',valid:false,message:""})
   let [selectedAnimals,setSelectedAnimals]=useState([])
   let [selectedColour,setSelectedColour]=useState("")
   let [tigerType,setTigerType]=useState("")
+
+
+  function form_is_valid(){
+    //filthy hack, uses all sorts of coerce to boolean.
+    let tigertype = selectedAnimals.find(d=>d==="Tiger") ? !!tigerType.length : true
+    return email.value.length && email.valid && pwd.valid && selectedAnimals.length && tigertype 
+  }
+
   //each of these components is pretty generic apart from TigerType - supply a list and some text and such, and you're good to go.
-  return <>
-    <ValidEmail state={[email,setEmail]}></ValidEmail>
-    {email.value}
-    <ValidPassword state={[pwd,setPwd]}></ValidPassword>
-    {pwd.message}
-    <CheckBoxGroup items={animals} title = {"Choose your animals:"}state={[selectedAnimals,setSelectedAnimals]} ></CheckBoxGroup>
-    {selectedAnimals.join(", ")}
-    <Select items={colours} labelid={"colour"} labeltext={"Select your colour: "} state={[selectedColour,setSelectedColour]} ></Select>
-    {selectedColour}
-    {selectedAnimals.find(d=>d==="Tiger")?<> 
-      <TigerType state={[tigerType,setTigerType]}></TigerType>
-      {tigerType}
-      </> : <></>
-    }
-  </>
+  return <div className='animalform'>
+    <form className='form'>
+      <h2>Contact Form</h2>
+      <ValidEmail state={[email,setEmail]}></ValidEmail>
+      <ValidPassword state={[pwd,setPwd]}></ValidPassword>
+      <Select items={colours} labelid={"colour"} labeltext={"Select your colour: "} state={[selectedColour,setSelectedColour]} ></Select>
+      <CheckBoxGroup items={animals} title = {"Choose your animals:"}state={[selectedAnimals,setSelectedAnimals]} ></CheckBoxGroup>
+      {selectedAnimals.find(d=>d==="Tiger")?<> 
+        <TigerType state={[tigerType,setTigerType]}></TigerType>
+        </> : <></>
+      }
+      <button>Submit</button>
+    </form>
+    <div className='result'>
+    <h2>Result</h2>
+      {/* this just shows the state of our form at the moment. 
+      Its pretty primitive but it could form the basis of a block style error message */}
+      <p>Email: {email.valid ? email.value : email.message}</p>
+      <p>Password: {pwd.message}</p>
+      <p>Selected colour: {selectedColour}</p>
+      <p>Selected animals: {selectedAnimals.length ? selectedAnimals.join(", ") :'No animals yet'}</p>
+      <p>Type of Tiger: {selectedAnimals.find(d=>d==="Tiger") ? tigerType:'Tiger type is not required'}</p>
+
+      {form_is_valid() ? <p className='good'>You're good to go!</p> : <p className='warn'>Something is wrong.</p>} 
+
+    </div>  
+  </div>
 }
 
 const colours= ["Blue", "Green", "Red", "Black","Brown"]
